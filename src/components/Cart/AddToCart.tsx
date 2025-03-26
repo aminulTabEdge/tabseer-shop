@@ -1,4 +1,4 @@
-'use client'
+"use client";
 import {
   Sheet,
   SheetContent,
@@ -13,11 +13,12 @@ import ShoppingBag from "./ShoppingBag";
 import useCart from "@/hooks/useCart";
 
 const AddToCart = () => {
-  const {cart}=useCart()
+  const { cart } = useCart();
+  console.log("cart length", cart);
   return (
     <Sheet>
       <SheetTrigger className="hover:cursor-pointer">
-       <ShoppingBag/>
+        <ShoppingBag />
       </SheetTrigger>
       <SheetContent>
         <SheetHeader>

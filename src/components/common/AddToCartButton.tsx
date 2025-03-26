@@ -2,6 +2,7 @@
 import axios from "axios";
 import { ShoppingCart } from "lucide-react";
 import { Button } from "../ui/button";
+import { getUserInfo } from "@/services/authServices";
 
 type TCart = {
   productId: string;
@@ -9,9 +10,10 @@ type TCart = {
 };
 
 const AddToCartButton = ({ productId, quantity }: TCart) => {
+  const userInfo = getUserInfo();
   const handleAddToCart = async () => {
     try {
-      const userId = "67de4c2803206c8724a660c2";
+      const userId = userInfo?._id;
 
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_API_URL}/api/v1/cart/add-to-cart`,

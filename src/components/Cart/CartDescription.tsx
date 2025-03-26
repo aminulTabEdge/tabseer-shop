@@ -1,18 +1,21 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import useCart from "@/hooks/useCart";
 import EmptyCart from "./EmptyCart";
 import Image from "next/image";
 import { Minus, Plus, Trash2 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { TbCurrencyTaka } from "react-icons/tb";
 import ProductOrder from "../products/ProductOrder";
 import { Button } from "../ui/button";
+import { getUserInfo } from "@/services/authServices";
 
 const CartDescription = () => {
   const { cart } = useCart();
-  console.log(cart?.products);
+  console.log("cart Details=>", cart);
+  const userInfo = getUserInfo();
 
   const [quantities, setQuantities] = useState<{ [key: string]: number }>(
     () => {
@@ -26,24 +29,51 @@ const CartDescription = () => {
 
   if (!cart?.products?.length) return <EmptyCart />;
 
+  const handleUpdateQuantity = async (
+    productId: string,
+    newQuantity: number
+  ) => {
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/v1/cart/update-quantity`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            userId: userInfo?._id, // Replace with actual user ID
+            productId: productId,
+            quantity: newQuantity,
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to update quantity");
+      }
+
+      setQuantities((prev) => ({
+        ...prev,
+        [productId]: newQuantity,
+      }));
+    } catch (error: any) {
+      toast.error("Could not update quantity. Please try again.");
+    }
+  };
+
   const handleIncrease = (productId: string) => {
-    setQuantities((prev) => ({
-      ...prev,
-      [productId]: (prev[productId] || 1) + 1,
-    }));
+    const newQuantity = (quantities[productId] || 1) + 1;
+    handleUpdateQuantity(productId, newQuantity);
   };
 
   const handleDecrease = (productId: string) => {
-    setQuantities((prev) => {
-      if (prev[productId] <= 1) {
-        toast("Quantity can't be less than 1");
-        return prev;
-      }
-      return {
-        ...prev,
-        [productId]: prev[productId] - 1,
-      };
-    });
+    if (quantities[productId] <= 1) {
+      toast("Quantity can't be less than 1");
+      return;
+    }
+    const newQuantity = quantities[productId] - 1;
+    handleUpdateQuantity(productId, newQuantity);
   };
 
   return (
@@ -65,7 +95,9 @@ const CartDescription = () => {
               <p>{item?.product?.name || "Product Name"}</p>
               {/* Quantity Manage container */}
               <div className="flex gap-3 text-[#133e87] items-center justify-between mt-2">
-                <p className="text-red-500">{item?.product?.price || 1000}</p>
+                <p className="text-red-500">
+                  {item?.product?.price * item?.quantity}
+                </p>
                 <button className="font-bold p-2 rounded-full hover:cursor-pointer text-red-500">
                   <Trash2 size={20} />
                 </button>
@@ -76,7 +108,7 @@ const CartDescription = () => {
                 >
                   <Minus size={20} />
                 </button>
-                <p className="text-red-500">{quantities[item?.product?._id]}</p>
+                <p className="text-red-500">{item?.quantity}</p>
                 {/* Increase Button */}
                 <button
                   onClick={() => handleIncrease(item?.product?._id)}

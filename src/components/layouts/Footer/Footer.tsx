@@ -4,9 +4,9 @@ import Link from "next/link";
 
 const contactInfo = [
   "Always Here for You",
-  "Call Us: 16469 (9am-9pm, Everyday)",
-  "Email Us: queries@acilogistics.net",
-  "ACI SHWAPNO E-COMMERCE LIMITED",
+  "Call Us: 01711781232 (9am-9pm, Everyday)",
+  "Email Us: info@tabseershop.com",
+  "Tabseer Inc",
 ];
 
 const infoLinks = [
@@ -34,7 +34,7 @@ const ResponsiveFooter = () => {
         <div className="flex justify-between gap-[30px] flex-col sm:flex-row flex-wrap w-full">
           <div className="w-full sm:w-[25%]">
             <Image
-              src={"/shwapno_logo.png"}
+              src={"/secondaryLogo.svg"}
               alt="TabseerShop logo"
               width={120}
               height={80}
